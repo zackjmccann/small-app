@@ -1,0 +1,46 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "small-app-3"
+  namespace: "default"
+  labels:
+    app: "small-app-3"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "small-app-3"
+  template:
+    metadata:
+      labels:
+        app: "small-app-3"
+    spec:
+      containers:
+      - name: "small-app-sha256-1"
+        image: "us-central1-docker.pkg.dev/spotted-apple/small-app-repo/small-app@sha256:f41c8ede3bfd48c44bea99fc940b233e60f3f781a458e76e4901866fa82175da"
+        env:
+        - name: "PORT"
+          value: "80000"
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "small-app-3-hpa-lddl"
+  namespace: "default"
+  labels:
+    app: "small-app-3"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "small-app-3"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      target:
+        type: "Utilization"
+        averageUtilization: 80

@@ -9,6 +9,10 @@ app = Flask(__name__)
 def hello():
     return "Hello I am a small app!"
 
+@app.route("/pagetwo")
+def hello_2():
+    return "Hello from pagetwo of this small app!"
+
 
 @app.errorhandler(500)
 def server_error(e):
