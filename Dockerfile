@@ -15,7 +15,7 @@ RUN apt-get update \
   && groupadd -g "${GID}" python \
   && useradd --create-home --no-log-init -u "${UID}" -g "${GID}" python \
   && chown python:python -R ${HOME}
-  
+
 USER python
 
 COPY --chown=python:python requirements*.txt ./
@@ -35,4 +35,6 @@ ENV FLASK_DEBUG="${FLASK_DEBUG}" \
 
 EXPOSE ${PORT}
 
-CMD ["gunicorn", "-c", "python:config.gunicorn", "src.wsgi:app"]
+ENTRYPOINT [ "bin/small_app_entrypoint" ]
+
+CMD [ "gunicorn", "-c", "./config/gunicorn.py", "src.app:create_app()" ]
