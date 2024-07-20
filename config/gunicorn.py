@@ -4,6 +4,7 @@ import multiprocessing
 import os
 from distutils.util import strtobool
 
+# TODO: Instead of binding to any interface on the network, bind to the external IP of container(?)
 bind = f"0.0.0.0:{os.getenv('PORT', '8000')}"
 
 accesslog = "-"
