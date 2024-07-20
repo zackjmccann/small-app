@@ -162,4 +162,7 @@ cython_debug/
 #.idea/
 
 # Development Scripts
-docker_dev.sh
+.small-app-dev*
+
+# IDE
+.vscode
