@@ -1,7 +1,9 @@
+name: ${STACK_NAME}
 services:
   web:
     build: .
-    image: ${IMAGE_TAG:-$COMPOSE_PROJECT_NAME}:${TAG_VERSION:-latest}
+    image: ${PROD_IMAGE}
+    container_name: ${PROD_CONTAINER}
     env_file:
       - ".env"
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
