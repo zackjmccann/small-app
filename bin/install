@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-pip install --upgrade pip
 pip install --no-warn-script-location --no-cache-dir --user -r requirements.txt
 
 if [ requirements.txt -nt requirements-lock.txt ]; then
