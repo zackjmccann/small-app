@@ -9,14 +9,13 @@ def create_app(test_config=None):
 
     if test_config is None:
         app.config.from_object("config.settings")
-        logger.debug(f'Server Name: {app.config["SERVER_NAME"]}')
     else:
         app.config.from_object('config.flask_testing', silent=True)
 
     try:
         os.makedirs(app.instance_path)
-    except OSError as err:
-        logger.debug(err)
+    except OSError:
+        logger.debug('Instance file exists')
 
     @app.route("/hello")
     def hello():

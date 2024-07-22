@@ -1,12 +1,11 @@
 import os
 from distutils.util import strtobool
 
-SECRET_KEY = os.environ["SECRET_KEY"]
 
-DEBUG = bool(strtobool(os.getenv("FLASK_DEBUG", "false")))
+DEBUG = bool(strtobool(os.getenv('FLASK_DEBUG', 'false')))
 
-SERVER_NAME = os.getenv(
-    "SERVER_NAME", "localhost:{0}".format(os.getenv("PORT", "8000"))
-)
+SECRET_KEY = os.getenv('SECRET_KEY')
 
-DATABASE=os.path.join(os.getenv("DATABASE", "db/data"), 'src.sqlite')
+DATABASE=os.path.join('app.sqlite')
+
+SERVER_NAME = os.getenv('SERVER_NAME', f'localhost:{os.getenv("PORT", "8000")}')
