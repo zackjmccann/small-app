@@ -1,5 +1,5 @@
 import functools
-
+import psycopg2
 from flask import (
     Blueprint,
     flash,
@@ -30,13 +30,16 @@ def register():
 
         if error is None:
             try:
-                db.execute(
-                    "INSERT INTO user (username, password) VALUES (?, ?)",
+                cursor = db.cursor()
+                cursor.execute(
+                    "INSERT INTO users (username, password) VALUES (%s, %s);",
                     (username, generate_password_hash(password)),
                 )
                 db.commit()
-            except db.IntegrityError:
+                cursor.close()
+            except psycopg2.errors.UniqueViolation:
                 error = f"User {username} is already registered."
+                cursor.close()
             else:
                 return redirect(url_for("auth.login"))
 
@@ -50,19 +53,23 @@ def login():
         username = request.form['username']
         password = request.form['password']
         db = get_db()
+        cursor = db.cursor()
         error = None
-        user = db.execute(
-            'SELECT * FROM user WHERE username = ?', (username,)
-        ).fetchone()
+        cursor.execute(
+            'SELECT * FROM users WHERE username = %s;', (username,)
+        )
+        db.commit()
+        user = cursor.fetchone()
+        cursor.close()
 
         if user is None:
             error = 'Incorrect username.'
-        elif not check_password_hash(user['password'], password):
+        elif not check_password_hash(user[2], password):
             error = 'Incorrect password.'
 
         if error is None:
             session.clear()
-            session['user_id'] = user['id']
+            session['user_id'] = user[0]
             return redirect(url_for('index'))
 
         flash(error)
@@ -76,9 +83,14 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
-        g.user = get_db().execute(
-            'SELECT * FROM user WHERE id = ?', (user_id,)
-        ).fetchone()
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(
+            'SELECT * FROM users WHERE id = %s;', (user_id,)
+        )
+        db.commit()
+        g.user = cursor.fetchone()
+        cursor.close()
 
 @bp.route('/logout')
 def logout():

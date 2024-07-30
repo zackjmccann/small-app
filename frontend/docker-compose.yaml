@@ -1,9 +1,9 @@
-name: ${STACK_NAME}
+name: small-app-frontend
 services:
   web:
     build: .
-    image: ${PROD_IMAGE}
-    container_name: ${PROD_CONTAINER}
+    image: ${IMAGE}
+    container_name: ${CONTAINER}
     env_file:
       - ".env"
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"

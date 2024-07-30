@@ -1,5 +1,5 @@
 import os
-from config.small_app_logger import logger
+# from config.small_app_logger import logger
 from flask import Flask
 from src import auth, blog, db
 
@@ -15,7 +15,8 @@ def create_app(test_config=None):
     try:
         os.makedirs(app.instance_path)
     except OSError:
-        logger.debug('Instance file exists')
+        pass
+        # logger.debug('Instance file exists')
 
     @app.route("/hello")
     def hello():
@@ -27,7 +28,7 @@ def create_app(test_config=None):
 
     @app.errorhandler(500)
     def server_error(e):
-        logging.exception("An error occurred during a request.")
+        # logging.exception("An error occurred during a request.")
         return "An internal error occurred.", 500
 
     db.init_app(app)

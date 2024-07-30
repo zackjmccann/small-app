@@ -8,7 +8,6 @@ from flask import (
     url_for
 )
 from werkzeug.exceptions import abort
-
 from src.auth import login_required
 from src.db import get_db
 
@@ -17,11 +16,15 @@ bp = Blueprint('blog', __name__)
 @bp.route('/')
 def index():
     db = get_db()
-    posts = db.execute(
+    cursor = db.cursor()
+    cursor.execute(
         'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' ORDER BY created DESC'
-    ).fetchall()
+        ' FROM posts p JOIN users u ON p.author_id = u.id'
+        ' ORDER BY created DESC;'
+    )
+    db.commit()
+    posts = cursor.fetchall()
+    cursor.close()
     return render_template('blog/index.html', posts=posts)
 
 @bp.route('/create', methods=('GET', 'POST'))
@@ -39,23 +42,30 @@ def create():
             flash(error)
         else:
             db = get_db()
-            db.execute(
-                'INSERT INTO post (title, body, author_id)'
-                ' VALUES (?, ?, ?)',
-                (title, body, g.user['id'])
+            cursor = db.cursor()
+            cursor.execute(
+                'INSERT INTO posts (title, body, author_id)'
+                ' VALUES (%s, %s, %s);',
+                (title, body, g.user[0])
             )
             db.commit()
+            cursor.close()
             return redirect(url_for('blog.index'))
 
     return render_template('blog/create.html')
 
 def get_post(id, check_author=True):
-    post = get_db().execute(
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
         'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' WHERE p.id = ?',
+        ' FROM posts p JOIN users u ON p.author_id = u.id'
+        ' WHERE p.id = %s;',
         (id,)
-    ).fetchone()
+    )
+    db.commit()
+    post = cursor.fetchone()
+    cursor.close()
 
     if post is None:
         abort(404, f"Post id {id} doesn't exist.")
@@ -82,12 +92,14 @@ def update(id):
             flash(error)
         else:
             db = get_db()
-            db.execute(
-                'UPDATE post SET title = ?, body = ?'
+            cursor = db.cursor()
+            cursor.execute(
+                'UPDATE posts SET title = %s, body = %s;'
                 ' WHERE id = ?',
                 (title, body, id)
             )
             db.commit()
+            cursor.close()
             return redirect(url_for('blog.index'))
 
     return render_template('blog/update.html', post=post)
@@ -97,6 +109,8 @@ def update(id):
 def delete(id):
     get_post(id)
     db = get_db()
-    db.execute('DELETE FROM post WHERE id = ?', (id,))
+    cursor = db.cursor()
+    cursor.execute('DELETE FROM posts WHERE id = %s;', (id,))
     db.commit()
+    cursor.close()
     return redirect(url_for('blog.index'))
