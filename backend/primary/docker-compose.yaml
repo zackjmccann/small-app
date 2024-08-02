@@ -1,0 +1,16 @@
+name: backend_${CONTAINER}
+services:
+  aloe:
+    build: 
+      dockerfile: ../Dockerfile
+    image: ${IMAGE}
+    container_name: ${CONTAINER}
+    env_file:
+      - "../.env"
+    restart: "${DOCKER_RESTART_POLICY:-no}"
+    ports:
+      - "5000:5432"
+    volumes:
+    - ./pgdata:/var/lib/postgresql/data
+    - ./config:/config
+    - ./archive:/mnt/server/archive

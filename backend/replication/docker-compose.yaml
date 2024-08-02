@@ -1,0 +1,22 @@
+name: backend_${CONTAINER}
+services:
+  basil:
+    build: 
+      dockerfile: ../Dockerfile
+    image: ${IMAGE}
+    container_name: ${CONTAINER}
+    networks:
+      - backend_aloe_default
+    env_file:
+      - "../.env"
+    restart: "${DOCKER_RESTART_POLICY:-no}"
+    ports:
+      - "5001:5432"
+    volumes:
+    - ./pgdata:/data
+    - ./config:/config
+    - ./archive:/mnt/server/archive
+
+networks:
+  backend_aloe_default:
+    external: true
