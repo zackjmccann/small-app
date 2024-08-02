@@ -1,9 +1,11 @@
-name: small-app-frontend
+name: small_app_${CONTAINER}
 services:
   web:
     build: .
     image: ${IMAGE}
     container_name: ${CONTAINER}
+    networks:
+      - backend_aloe_default
     env_file:
       - ".env"
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
@@ -14,3 +16,7 @@ services:
           memory: "${DOCKER_WEB_MEMORY:-0}"
     ports:
       - "${DOCKER_WEB_PORT_FORWARD:-127.0.0.1:8000}:${PORT:-8000}"
+
+networks:
+  backend_aloe_default:
+    external: true
