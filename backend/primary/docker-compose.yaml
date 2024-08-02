@@ -8,9 +8,7 @@ services:
     env_file:
       - "../.env"
     restart: "${DOCKER_RESTART_POLICY:-no}"
-    ports:
-      - "5000:5432"
     volumes:
-    - ./pgdata:/var/lib/postgresql/data
+    - ./pgdata:/data
     - ./config:/config
     - ./archive:/mnt/server/archive
