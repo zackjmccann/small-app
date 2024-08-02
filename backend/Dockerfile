@@ -1,16 +1,14 @@
-FROM postgres:16.3
+FROM postgres:15.0
 
 ENV HOME=/db
 ENV PORT=5432
 
 WORKDIR ${HOME}
-
-RUN apt-get update && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man \
-    && apt-get clean
     
-COPY bin/init.sql /docker-entrypoint-initdb.d/init.sql
+COPY init_sql/ /docker-entrypoint-initdb.d/
+COPY --chown=999:999 config/ ./config
+RUN chmod 0755 config/*
 
 EXPOSE ${PORT}
 
-CMD [ "postgres" ]
+CMD [ "postgres", "-c", "config_file=/config/postgresql.conf"]
